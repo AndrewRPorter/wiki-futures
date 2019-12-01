@@ -29,3 +29,11 @@ def test_bad_params():
     dispatcher = WikiDispatcher()
     with pytest.raises(ValueError):
         dispatcher.get_content()
+
+
+def test_bad_titles():
+    bad_title = ["bad_query"]  # this should almost always be a bad query
+    dispatcher = WikiDispatcher()
+    with pytest.warns(None) as record:
+        results = dispatcher.get_content(titles=bad_title)
+    assert len(record) == 1

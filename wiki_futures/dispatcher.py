@@ -1,3 +1,4 @@
+import warnings
 from concurrent.futures import as_completed
 
 import requests
@@ -7,14 +8,13 @@ API_URL = "https://en.wikipedia.org/w/api.php"
 USER_AGENT = "wiki-futures (https://github.com/AndrewRPorter/wiki-futures)"
 MAX_WORKERS = 8
 
+
 class WikiDispatcher:
     headers = {"User-Agent": USER_AGENT}
-    def __init__(self, titles=None, num=None, workers=MAX_WORKERS):
+
+    def __init__(self, num=None, workers=MAX_WORKERS):
         self.num = num
         self.workers = workers
-
-        if titles:
-            self.titles = titles
 
     def get_titles(self, num):
         """Queries a given random number of titles from Wikipedia"""
@@ -34,24 +34,27 @@ class WikiDispatcher:
 
         all_data = {}
 
-        titles = titles if titles else self.get_titles(num)  # use custom titles to function
+        titles = titles if titles else self.get_titles(num)  # use custom titles if provided
 
         with FuturesSession(max_workers=self.workers) as session:
-            query_params = {"prop": "extracts", "explaintext": "", "rvprop": "ids", "format": "json", "action": "query"}
-            futures = [session.get(f"{API_URL}?titles={title}", params=query_params, headers=self.headers) for title in titles]
+            query_params = {"prop": "extracts", "explaintext": "", "format": "json", "action": "query"}
+            futures = [
+                session.get(f"{API_URL}?titles={title}", params=query_params, headers=self.headers) for title in titles
+            ]
 
-            for future in as_completed(futures):
+            for future in as_completed(futures):  # add data to dictionary when futures complete
                 resp = future.result()
                 data = resp.json()
-                page_id = list(data["query"]["pages"].keys())[0]
+
+                page_id = list(data["query"]["pages"].keys())[
+                    0
+                ]  # page_id not accessible without iteration over page keys
                 title = data["query"]["pages"][page_id]["title"]
 
-                if "extract" not in data["query"]["pages"][page_id]:
-                    # TODO: more elegant way to handle this
-                    print("couldn't get extract from:", title, page_id, data)
-                    continue
-
-                content = data["query"]["pages"][page_id]["extract"]
-                all_data[title] = content
+                if page_id == "-1":  # title yielded a bad page query
+                    warnings.warn(f"unable to get valid page for '{title}'", RuntimeWarning)
+                else:
+                    content = data["query"]["pages"][page_id]["extract"]
+                    all_data[title] = content
 
         return all_data
