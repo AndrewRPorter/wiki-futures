@@ -14,11 +14,18 @@ def test_titles():
 
 def test_results_size():
     dispatcher = WikiDispatcher()
-    results = dispatcher.parse_all(TEST_NUM_PAGES)
+    results = dispatcher.get_content(TEST_NUM_PAGES)
     assert len(results) == TEST_NUM_PAGES
+
+
+def test_results_titles():
+    titles = ["Python", "Wikipedia"]
+    dispatcher = WikiDispatcher()
+    results = dispatcher.get_content(titles=titles)
+    assert len(results) == len(titles)
 
 
 def test_bad_params():
     dispatcher = WikiDispatcher()
     with pytest.raises(ValueError):
-        dispatcher.parse_all()
+        dispatcher.get_content()

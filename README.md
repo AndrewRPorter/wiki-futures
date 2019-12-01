@@ -14,7 +14,7 @@ Usage
 ```python
 from wiki_futures.dispatcher import WikiDispatcher
 dispatcher = WikiDispatcher(num=10)
-all_content = dispatcher.parse_all()
+all_content = dispatcher.get_content()
 ```
 
 If you don't know how many pages you want to get on initialization, you can create the dispatcher like this:
@@ -22,7 +22,7 @@ If you don't know how many pages you want to get on initialization, you can crea
 ```python
 from wiki_futures.dispatcher import WikiDispatcher
 dispatcher = WikiDispatcher()
-all_content = dispatcher.parse_all(num=10)
+all_content = dispatcher.get_content(num=10)
 ```
 
 Motivation
