@@ -1,7 +1,7 @@
 wiki-futures
 ------------
 
-Uses python `requests_futures` to asynchronously download Wikipedia pages.
+Uses python [requests_futures](https://github.com/ross/requests-futures) to asynchronously download Wikipedia pages.
 
 Installation
 ------------

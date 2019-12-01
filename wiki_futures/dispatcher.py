@@ -27,7 +27,7 @@ class WikiDispatcher:
             raise ValueError("must provide at least one URL to scape")
 
         all_data = {}
-        
+
         titles = self.get_titles(num)
 
         with FuturesSession() as session:
