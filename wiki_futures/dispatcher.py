@@ -3,8 +3,6 @@ from concurrent.futures import as_completed
 import requests
 from requests_futures.sessions import FuturesSession
 
-LIMIT = 500
-
 
 class WikiDispatcher:
     def __init__(self, titles=None, num=None):
@@ -31,7 +29,7 @@ class WikiDispatcher:
         titles = self.get_titles(num)
 
         with FuturesSession() as session:
-            query_params = {"prop": "extracts|revisions", "explaintext": "", "rvprop": "ids"}
+            query_params = {"prop": "extracts", "explaintext": "", "rvprop": "ids"}
             futures = [
                 session.get(
                     f"https://en.wikipedia.org/w/api.php?format=json&action=query&titles={title}", params=query_params
