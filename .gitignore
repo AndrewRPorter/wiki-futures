@@ -2,3 +2,6 @@ main.py
 *.pyc
 *__pycache__/
 TODO
+*build/
+*dist/
+*egg-info/

@@ -11,15 +11,13 @@ Installation
 Usage
 -----
 
-Get 10 random wikipedia articles
-
+Get 10 random wikipedia articles. Returns a dictionary of (title, content) pairs for each article
 ```python
 from wiki_futures import dispatcher
 content = dispatcher.get_content(10)
 ```
 
 If you want to pass in custom titles you can do so like this
-
 ```python
 content = dispatcher.get_content(titles=["Python", "GitHub"])
 ```
