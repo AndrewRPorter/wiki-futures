@@ -7,6 +7,7 @@ from requests_futures.sessions import FuturesSession
 API_URL = "https://en.wikipedia.org/w/api.php"
 USER_AGENT = "wiki-futures (https://github.com/AndrewRPorter/wiki-futures)"
 MAX_WORKERS = 8
+MAX_RNLIMIT = 500
 
 headers = {"User-Agent": USER_AGENT}
 
@@ -15,9 +16,35 @@ def get_titles(num):
     """Queries a given random number of titles from Wikipedia"""
     params = {"rnnamespace": 0, "list": "random", "rnlimit": num, "format": "json", "action": "query"}
 
-    random_resp = requests.get(f"{API_URL}", params=params, headers=headers)
-    random_data = random_resp.json()
-    return [page["title"] for page in random_data["query"]["random"]]
+    if num > MAX_RNLIMIT:
+        splits = num // MAX_RNLIMIT  # integer of how many times over num is
+
+        num_combinations = []
+
+        for _ in range(0, splits):
+            num_combinations.append(MAX_RNLIMIT)
+
+        if num % MAX_RNLIMIT != 0:  # append remainder if exists
+            num_combinations.append(num - sum(num_combinations))
+
+        all_titles = []
+
+        for i in num_combinations:
+            params["rnlimit"] = i
+            random_resp = requests.get(f"{API_URL}", params=params, headers=headers)
+            random_data = random_resp.json()
+            all_titles += [page["title"] for page in random_data["query"]["random"]]
+
+        set_all_titles = set(all_titles)  # check for duplicates
+
+        if len(set_all_titles) < num:
+            warnings.warn(f"duplicate titles when using large num", RuntimeWarning)
+
+        return all_titles
+    else:
+        random_resp = requests.get(f"{API_URL}", params=params, headers=headers)
+        random_data = random_resp.json()
+        return [page["title"] for page in random_data["query"]["random"]]
 
 
 def get_content(num=0, workers=8, titles=None):
@@ -33,8 +60,8 @@ def get_content(num=0, workers=8, titles=None):
     all_data = {}
 
     with FuturesSession(max_workers=num_workers) as session:
-        query_params = {"prop": "extracts", "explaintext": "", "format": "json", "action": "query"}
-        futures = [session.get(f"{API_URL}?titles={title}", params=query_params, headers=headers) for title in titles]
+        params = {"prop": "extracts", "explaintext": "", "format": "json", "action": "query"}
+        futures = [session.get(f"{API_URL}?titles={title}", params=params, headers=headers) for title in titles]
 
         for future in as_completed(futures):  # add data to dictionary when futures complete
             resp = future.result()

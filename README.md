@@ -15,13 +15,13 @@ Get 10 random wikipedia articles
 
 ```python
 from wiki_futures import dispatcher
-all_content = dispatcher.get_content(10)
+content = dispatcher.get_content(10)
 ```
 
 If you want to pass in custom titles you can do so like this
 
 ```python
-all_content = dispatcher.get_content(titles=["Python", "GitHub"])
+content = dispatcher.get_content(titles=["Python", "GitHub"])
 ```
 
 Pass in workers value to change the default, which is 8
@@ -29,6 +29,13 @@ Pass in workers value to change the default, which is 8
 from wiki_futures import dispatcher
 content = dispatcher.get_content(10, workers=4)
 ```
+
+Get list of random titles. This is helpful because the limit for non-bots is 500.
+```python
+from wiki_futures import dispatcher
+titles = dispatcher.get_titles(1000)
+```
+
 
 Motivation
 ----------
