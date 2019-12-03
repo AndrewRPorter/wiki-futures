@@ -11,18 +11,23 @@ Installation
 Usage
 -----
 
+Get 10 random wikipedia articles
+
 ```python
-from wiki_futures.dispatcher import WikiDispatcher
-dispatcher = WikiDispatcher(num=10)
-all_content = dispatcher.get_content()
+from wiki_futures import dispatcher
+all_content = dispatcher.get_content(10)
 ```
 
-If you don't know how many pages you want to get on initialization, you can create the dispatcher like this:
+If you want to pass in custom titles you can do so like this
 
 ```python
-from wiki_futures.dispatcher import WikiDispatcher
-dispatcher = WikiDispatcher()
-all_content = dispatcher.get_content(num=10)
+all_content = dispatcher.get_content(titles=["Python", "GitHub"])
+```
+
+Pass in workers value to change the default, which is 8
+```python
+from wiki_futures import dispatcher
+content = dispatcher.get_content(10, workers=4)
 ```
 
 Motivation
